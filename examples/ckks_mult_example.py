@@ -26,16 +26,31 @@ def main():
     decryptor = CKKSDecryptor(params, secret_key)
     evaluator = CKKSEvaluator(params)
 
-    message1 = [0.5, 0.3 + 0.2j, 0.78, 0.88j]
-    message2 = [0.2, 0.11, 0.4 + 0.67j, 0.9 + 0.99j]
+    # 5*(ciph1**5)*(ciph2**4)
+    message1 = [11000, 1, 1, 1]
+    message2 = [0.05, 1, 1, 1]
+    message3 = [5, 1, 1, 1]
+
     plain1 = encoder.encode(message1, scaling_factor)
     plain2 = encoder.encode(message2, scaling_factor)
+    plain3 = encoder.encode(message3, scaling_factor)
     ciph1 = encryptor.encrypt(plain1)
     ciph2 = encryptor.encrypt(plain2)
-    ciph_prod = evaluator.multiply(ciph1, ciph2, relin_key)
-    decrypted_prod = decryptor.decrypt(ciph_prod)
+
+    ciph_prod1 = evaluator.multiply(ciph1, ciph1, relin_key)
+    for _ in range(3):
+        ciph_prod1 = evaluator.multiply(ciph_prod1, ciph1, relin_key)
+
+    ciph_prod2 = evaluator.multiply(ciph2, ciph2, relin_key)
+    for _ in range(2):
+        ciph_prod2 = evaluator.multiply(ciph_prod2, ciph2, relin_key)
+
+    ciph_prod = evaluator.multiply(ciph_prod1, ciph_prod2, relin_key)
+    result = evaluator.multiply_plain(ciph_prod, plain3)
+
+    decrypted_prod = decryptor.decrypt(result)
     decoded_prod = encoder.decode(decrypted_prod)
-    
+
     print(decoded_prod)
 
 if __name__ == '__main__':
