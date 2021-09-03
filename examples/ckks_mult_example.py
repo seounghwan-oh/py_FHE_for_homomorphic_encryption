@@ -26,7 +26,7 @@ def main():
     decryptor = CKKSDecryptor(params, secret_key)
     evaluator = CKKSEvaluator(params)
 
-    # result comparison
+    # write
     message1 = [11000, 1, 1, 1]
     message2 = [0.05, 1, 1, 1]
     message3 = [5, 1, 1, 1]
@@ -51,7 +51,8 @@ def main():
     decrypted_prod = decryptor.decrypt(result)
     decoded_prod = encoder.decode(decrypted_prod)
 
-    print(decoded_prod)
+    # print(decoded_prod)
+    file = open("ckks_mult_example.txt", "w")
 
     for i in range(len(message1)):
         A1 = message1[i]
@@ -61,12 +62,22 @@ def main():
 
         origin_result = abs(complex(5 * A5 * B4, 0))
         ckks_result = abs(decoded_prod[i])
-        result = abs(complex(0.0001, 0))
+        operation_result = ((origin_result - ckks_result) / (origin_result))
+        percent_result = abs(complex(0.0001, 0))
 
-        if ((origin_result - ckks_result) / (origin_result)) < result:
-            print("True")
+        data = "A^5:" + str(A5) + " " + "B^4:" + str(B4) + " " + "CKKSresult:" + str(
+            ckks_result) + " " + "Originresult:" + str(origin_result)
+        if operation_result < percent_result:
+            # print("True")
+            result_data = data + " " + "result < 0.01%:True"
+            file.write(result_data + "\n")
         else:
-            print("False")
+            # print("False")
+            result_data = data + " " + "result < 0.01%:False"
+            file.write(result_data + "\n")
+
+    file.close()
+    print("Complete")
 
 if __name__ == '__main__':
     main()
