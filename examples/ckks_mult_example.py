@@ -26,7 +26,7 @@ def main():
     decryptor = CKKSDecryptor(params, secret_key)
     evaluator = CKKSEvaluator(params)
 
-    # 5*(ciph1**5)*(ciph2**4)
+    # result comparison
     message1 = [11000, 1, 1, 1]
     message2 = [0.05, 1, 1, 1]
     message3 = [5, 1, 1, 1]
@@ -52,6 +52,21 @@ def main():
     decoded_prod = encoder.decode(decrypted_prod)
 
     print(decoded_prod)
+
+    for i in range(len(message1)):
+        A1 = message1[i]
+        A5 = A1 ** 5
+        B1 = message2[i]
+        B4 = B1 ** 4
+
+        origin_result = abs(complex(5 * A5 * B4, 0))
+        ckks_result = abs(decoded_prod[i])
+        result = abs(complex(0.0001, 0))
+
+        if ((origin_result - ckks_result) / (origin_result)) < result:
+            print("True")
+        else:
+            print("False")
 
 if __name__ == '__main__':
     main()
